@@ -1,4 +1,4 @@
-
+#define SOL_ALL_SAFTIES_ON 1
 #include "Game.hpp"
 
 #include <iostream>
@@ -51,16 +51,20 @@ Game::~Game()
 
 void Game::load_level()
 {
-   sol::table table = lua["gameobjs"];
+   sol::lua_table table = lua["gameobjs"];
    // I wanted to use size in the for loop but its always 0??
    const std::size_t size = table.size();
-   
-   for(int i = 1; i<=5; i++){
-      std::string kind = static_cast<std::string>(table["player" + std::to_string(i)]["kind"]);
-      float xpos = static_cast<float>(table["player" + std::to_string(i)]["xpos"]);
-      float ypos = static_cast<float>(table["player" + std::to_string(i)]["ypos"]);
-      float xvel = static_cast<float>(table["player" + std::to_string(i)]["xvel"]);
-      float yvel = static_cast<float>(table["player" + std::to_string(i)]["yvel"]);
+
+   for(const auto& pair : table){
+      sol::object key = pair.first;
+      sol::object value = pair.second;
+
+      sol::type t = value.get_type();
+      std::string kind = static_cast<std::string>(table[key][value]);
+      float xpos = static_cast<float>(table[key][value]);
+      float ypos = static_cast<float>(table[key][value]);
+      float xvel = static_cast<float>(table[key][value]);
+      float yvel = static_cast<float>(table[key][value]);
 
       if(kind == "chopper"){
          auto chopper = std::make_unique<Chopper>(xpos, ypos, xvel, yvel);
