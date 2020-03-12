@@ -19,6 +19,7 @@ Game::Game(const char* title, int xpos, int ypos, int width, int height, bool fu
    //initialize sol::state, open libraries and deal with lua config script
    lua.open_libraries(sol::lib::base, sol::lib::package);
    lua.script_file("config.lua");
+   //The try catch block in main will catch any exceptions that are thrown
 
    Uint32 flags{};
    if (fullscreen) {
@@ -52,19 +53,19 @@ Game::~Game()
 void Game::load_level()
 {
    sol::lua_table table = lua["gameobjs"];
-   // I wanted to use size in the for loop but its always 0??
-   const std::size_t size = table.size();
 
    for(const auto& pair : table){
-      sol::object key = pair.first;
+      sol::object k = pair.first;
       sol::object value = pair.second;
 
-      sol::type t = value.get_type();
-      std::string kind = static_cast<std::string>(table[key][value]);
-      float xpos = static_cast<float>(table[key][value]);
-      float ypos = static_cast<float>(table[key][value]);
-      float xvel = static_cast<float>(table[key][value]);
-      float yvel = static_cast<float>(table[key][value]);
+      //sol::lua_table members = lua[key.as<std::string>()];
+      std::string key = k.as<std::string>();
+
+      std::string kind = static_cast<std::string>(table[key]["kind"]);
+      float xpos = static_cast<float>(table[key]["xpos"]);
+      float ypos = static_cast<float>(table[key]["ypos"]);
+      float xvel = static_cast<float>(table[key]["xvel"]);
+      float yvel = static_cast<float>(table[key]["yvel"]);
 
       if(kind == "chopper"){
          auto chopper = std::make_unique<Chopper>(xpos, ypos, xvel, yvel);
